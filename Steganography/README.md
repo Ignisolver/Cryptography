@@ -1,15 +1,20 @@
 1. Skrót  
 Program służy do ukrywania wiadomości w plikach .zip stosując metodę steganografii.  
 
-2. Opis działania.
+2.  
+a) Opis działania - metoda I.  
 Struktura pliku .zip przedstawia się tak jak zostało to zaprezentowane na obrazkach pomocniczych. W pierwszej kolejności w pliku zip znajdują się skompresowane pliki zaczynające się od nagłówków. Po sekcji plików jest katalog głowny zawierający informacje dotyczące całego pliku zip. 
 Wiadomość (oznaczona jako Bolb) jest zapisywana (przez dopisany kod) po sekcji plików tuż przed nagłówkiem katalogu centralnego (głównego) który znajduje się na końcu pliku. Następnie w procesie zapisywania na dysk wczytanego do pamięci RAM pliku .zip aby skompensować przesunięcie nagłówka katalogu centralnego spowodowane dodaniem wiadomości aktualizowany jest wskaźnik (już przez samą bibliotekę), który wskazuje na początek katalogu centralnego. Wykorzystując wbudowaną fuckję katalog główny jest zapisywany po wiadmości.
-Dzięki temu, że plik .zip określa w nagłówkach jaki jest rozmiar poszczególnych plików, wiadmość nie jest doklejana do ostatniego pliku ale znajduje się w "pustej przestrzeni" pomiędzy końcem ostatniego pliku, a początkiem katalogu centralnego.
+Dzięki temu, że plik .zip określa w nagłówkach jaki jest rozmiar poszczególnych plików, wiadmość nie jest doklejana do ostatniego pliku ale znajduje się w "pustej przestrzeni" pomiędzy końcem ostatniego pliku, a początkiem katalogu centralnego.  
+b) Opis działania - metoda II.
+Wiadomość zostaje ukryta bezpośrednio w komentarzach w nagłówkach każdego pliku oraz w komentarzu w katalogu głównym. Jest ukrywana równomiernie - w każdym miejscu ukryte części mają podobną długość.
 
 3. Użytkowanie  
-Plik hide.py służy do ukrycia wiadomości. Należy podać ścieżkę lub nazwę pliku oraz wiadomość.
-Plik unhide.py służy do odczytania wiadmości z pliku w którym została ona ukryta. Należy podać ścieżkę do pliku.
-Na ten moment nie działają polskie znaki.
+W pakiecie zip_steganography znajdują się funkcje hide_msg oraz show_msg służace odpowiedni o do ukrywania i pokazywania ukrytej wiadmości. Za pomocą parametru method można wybrać czy wiadomość ukryjemy przed końcem katalogu centralnego czy w komentarzach.
+Dodatkowo zaimplementowana została funkcjonalność ukrywania w pliku zip pliku .exe oraz uruchamiania ukrytego pliku .exe.
+Służy do tego odpowienio funkcje hide_exe_in_zip i run_exe_from_zip. 
+Moduł ukrywa tekst jawny poprzez zmianę kodowania na ibm039 - z tego powodu nie są dozwolone polskie znaki.
+Jak pokzały testy niektóre antywirusy uznają plik z wiadomością schowaną przed katalogiem głównym jako niebezpieczny. Żaden antywirus nie uznał za niebezpieczny plik z wiadomością, a newet plikiem .exe schowanym w komentarzach. 
 
 4. Obrazki pomocnicze  
 Wizualizacja miejsca ukrycia wiadomości  
@@ -20,7 +25,9 @@ Obrazowa struktura pliku .zip
 
 ![alt text](https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/ZIP-64_Internal_Layout.svg/1920px-ZIP-64_Internal_Layout.svg.png)
 
-5. Działanie w kodzie  
+5. Wyjaśnienia dotyczące kodu są zamieszczone w załączonej prezentacji.
+
+<!-- 5. Działanie w kodzie - metoda I  
 ZAPIS - UKRYWANIE WIADOMOŚCI
 Zmodyfikujemy funkcję close oraz konstruktor klasy ZipFile z biblioteki zipfile
 ```python
@@ -185,4 +192,4 @@ def unhide_msg(filename):
     with MyZipFileUnHide(filename, 'r') as file:
         msg = file.msg
     return msg
-```
+``` -->
